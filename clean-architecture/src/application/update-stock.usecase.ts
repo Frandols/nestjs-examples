@@ -1,6 +1,6 @@
 import ProductRepository from '@domain/product/product.repository'
 
-export class UpdateStockUseCase {
+export default class UpdateStockUseCase {
   constructor(private readonly productRepository: ProductRepository) {}
 
   async execute(input: {

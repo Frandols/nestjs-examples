@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsNumber, IsString, Min } from 'class-validator'
 
-export class AddItemToOrderDto {
+export default class AddItemToOrderDto {
   @ApiProperty()
   @IsString()
   productId: string

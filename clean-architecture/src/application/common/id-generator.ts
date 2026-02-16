@@ -1,4 +1,4 @@
-export interface IdGenerator {
+export default interface IdGenerator {
   generate(): string
 }
 

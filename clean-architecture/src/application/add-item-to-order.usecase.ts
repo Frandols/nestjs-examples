@@ -1,4 +1,4 @@
-import { IdGenerator } from '@application/common/id-generator'
+import IdGenerator from '@application/common/id-generator'
 import OrderRepository from '@domain/order/order.repository'
 import ProductRepository from '@domain/product/product.repository'
 

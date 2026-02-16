@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsNumber, IsString, Min } from 'class-validator'
 
-export class CreateProductDto {
+export default class CreateProductDto {
   @ApiProperty()
   @IsString()
   name: string

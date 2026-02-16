@@ -4,11 +4,11 @@ import ConfirmOrderUseCase from '@application/confirm-order.usecase'
 import CreateOrderUseCase from '@application/create-order.usecase'
 import { Body, Controller, Param, Patch, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { AddItemToOrderDto } from '@presentation/dto/add-item-to-order.dto'
+import AddItemToOrderDto from '@presentation/dto/add-item-to-order.dto'
 
 @ApiTags('orders')
 @Controller('orders')
-export class OrderController {
+export default class OrderController {
   constructor(
     private readonly createOrderUseCase: CreateOrderUseCase,
     private readonly addItemUseCase: AddItemToOrderUseCase,
