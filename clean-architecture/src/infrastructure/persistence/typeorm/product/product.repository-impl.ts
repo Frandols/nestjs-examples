@@ -24,3 +24,5 @@ export default class ProductRepositoryImpl implements ProductRepository {
     return Product.from(ormProduct)
   }
 }
+
+export const PRODUCT_REPOSITORY = Symbol('PRODUCT_REPOSITORY')

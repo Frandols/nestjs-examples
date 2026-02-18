@@ -1,31 +1,32 @@
 import AddItemToOrderUseCase from '@application/add-item-to-order.usecase'
 import CancelOrderUseCase from '@application/cancel-order.usecase'
-import IdGenerator, { ID_GENERATOR } from '@application/common/id-generator'
+import IdGenerator from '@application/common/id-generator'
 import ConfirmOrderUseCase from '@application/confirm-order.usecase'
 import CreateOrderUseCase from '@application/create-order.usecase'
 import CreateProductUseCase from '@application/create-product.usecase'
 import DeactivateProductUseCase from '@application/deactivate-product.usecase'
 import UpdateStockUseCase from '@application/update-stock.usecase'
-import OrderRepository, {
-  ORDER_REPOSITORY,
-} from '@domain/order/order.repository'
-import ProductRepository, {
-  PRODUCT_REPOSITORY,
-} from '@domain/product/product.repository'
-import UuidIdGenerator from '@infrastructure/id/uuid-id-generator'
+import OrderRepository from '@domain/order/order.repository'
+import ProductRepository from '@domain/product/product.repository'
+import UuidIdGenerator, {
+  ID_GENERATOR,
+} from '@infrastructure/id/uuid-id-generator'
 import OrderItemOrmEntity from '@infrastructure/persistence/typeorm/order-item/order-item.orm-entity'
 import OrderOrmEntity from '@infrastructure/persistence/typeorm/order/order.orm-entity'
-import OrderRepositoryImpl from '@infrastructure/persistence/typeorm/order/order.repository-impl'
+import OrderRepositoryImpl, {
+  ORDER_REPOSITORY,
+} from '@infrastructure/persistence/typeorm/order/order.repository-impl'
 import ProductOrmEntity from '@infrastructure/persistence/typeorm/product/product.orm-entity'
-import ProductRepositoryImpl from '@infrastructure/persistence/typeorm/product/product.repository-impl'
-import { typeOrmConfig } from '@infrastructure/persistence/typeorm/typeorm.config'
+import ProductRepositoryImpl, {
+  PRODUCT_REPOSITORY,
+} from '@infrastructure/persistence/typeorm/product/product.repository-impl'
 import { Module, ValidationPipe } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import OrderController from '@presentation/controllers/order.controller'
-import ProductController from '@presentation/controllers/product.controller'
+import OrderController from '@web-api/controllers/order.controller'
+import ProductController from '@web-api/controllers/product.controller'
 import Joi from 'joi'
 
 @Module({

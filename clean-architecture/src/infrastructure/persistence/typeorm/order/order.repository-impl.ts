@@ -27,3 +27,5 @@ export default class OrderRepositoryImpl implements OrderRepository {
     return Order.from(ormOrder)
   }
 }
+
+export const ORDER_REPOSITORY = Symbol('ORDER_REPOSITORY')

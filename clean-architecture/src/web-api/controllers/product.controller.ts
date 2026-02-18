@@ -3,8 +3,8 @@ import DeactivateProductUseCase from '@application/deactivate-product.usecase'
 import UpdateStockUseCase from '@application/update-stock.usecase'
 import { Body, Controller, Param, Patch, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import CreateProductDto from '@presentation/dto/create-product.dto'
-import UpdateStockDto from '@presentation/dto/update-stock.dto'
+import CreateProductDto from '@web-api/dto/create-product.dto'
+import UpdateStockDto from '@web-api/dto/update-stock.dto'
 
 @ApiTags('products')
 @Controller('products')

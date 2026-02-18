@@ -6,3 +6,5 @@ export default class UuidIdGenerator implements IdGenerator {
     return uuidv4()
   }
 }
+
+export const ID_GENERATOR = Symbol('ID_GENERATOR')
