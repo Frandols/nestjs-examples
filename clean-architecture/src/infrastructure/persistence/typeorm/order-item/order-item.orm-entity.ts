@@ -3,23 +3,23 @@ import OrderOrmEntity from '@infrastructure/persistence/typeorm/order/order.orm-
 import { Check, Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm'
 
 @Entity('order_items')
-@Check('product_id != ""', 'product_id_must_not_be_empty')
-@Check('quantity > 0', 'quantity_must_be_positive')
-@Check('unit_price > 0', 'unit_price_must_be_positive')
+@Check(`TRIM("productId") <> ''`)
+@Check(`"quantity" > 0`)
+@Check(`"unitPrice" > 0`)
 export default class OrderItemOrmEntity {
   @PrimaryColumn()
   id: string
 
-  @Column('varchar')
+  @Column({ nullable: false })
   productId: string
 
-  @Column('int')
+  @Column('int', { nullable: false })
   quantity: number
 
-  @Column('decimal')
+  @Column('decimal', { precision: 10, scale: 2, nullable: false })
   unitPrice: number
 
-  @ManyToOne(() => OrderOrmEntity, (order) => order.items)
+  @ManyToOne(() => OrderOrmEntity, (order) => order.items, { nullable: false })
   order: OrderOrmEntity
 
   static from(domainOrderItem: OrderItem) {

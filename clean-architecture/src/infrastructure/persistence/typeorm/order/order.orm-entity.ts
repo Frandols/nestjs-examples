@@ -1,7 +1,7 @@
+import OrderStatus from '@domain/order/enums/order-status.enum'
 import Order from '@domain/order/order.entity'
 import OrderItemOrmEntity from '@infrastructure/persistence/typeorm/order-item/order-item.orm-entity'
 import {
-  Check,
   Column,
   Entity,
   OneToMany,
@@ -10,13 +10,16 @@ import {
 } from 'typeorm'
 
 @Entity('orders')
-@Check('status IN ("CREATED", "CONFIRMED", "CANCELLED")')
 export default class OrderOrmEntity {
   @PrimaryColumn()
   id: string
 
-  @Column()
-  status: string
+  @Column({
+    type: 'enum',
+    enum: OrderStatus,
+    default: OrderStatus.CREATED,
+  })
+  status: OrderStatus
 
   @OneToMany(() => OrderItemOrmEntity, (item) => item.order, {
     cascade: true,

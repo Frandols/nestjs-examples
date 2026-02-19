@@ -2,9 +2,9 @@ import Product from '@domain/product/product.entity'
 import { Check, Column, Entity, PrimaryColumn } from 'typeorm'
 
 @Entity('products')
-@Check('name != ""', 'name_must_not_be_empty')
-@Check('price > 0', 'price_must_be_positive')
-@Check('stock >= 0', 'stock_must_be_non_negative')
+@Check(`TRIM("name") <> ''`)
+@Check(`"price" > 0`)
+@Check(`"stock" >= 0`)
 export default class ProductOrmEntity {
   @PrimaryColumn()
   id: string
