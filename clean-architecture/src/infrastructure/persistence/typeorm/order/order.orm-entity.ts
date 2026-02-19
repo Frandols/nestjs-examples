@@ -1,6 +1,7 @@
 import Order from '@domain/order/order.entity'
 import OrderItemOrmEntity from '@infrastructure/persistence/typeorm/order-item/order-item.orm-entity'
 import {
+  Check,
   Column,
   Entity,
   OneToMany,
@@ -9,6 +10,7 @@ import {
 } from 'typeorm'
 
 @Entity('orders')
+@Check('status IN ("CREATED", "CONFIRMED", "CANCELLED")')
 export default class OrderOrmEntity {
   @PrimaryColumn()
   id: string
