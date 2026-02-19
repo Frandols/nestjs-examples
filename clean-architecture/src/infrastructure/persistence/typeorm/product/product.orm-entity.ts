@@ -9,16 +9,16 @@ export default class ProductOrmEntity {
   @PrimaryColumn()
   id: string
 
-  @Column()
+  @Column({ nullable: false })
   name: string
 
-  @Column('decimal')
+  @Column('decimal', { precision: 10, scale: 2, nullable: false })
   price: number
 
-  @Column('int')
+  @Column('int', { nullable: false })
   stock: number
 
-  @Column()
+  @Column('boolean', { nullable: false })
   active: boolean
 
   static from(domainProduct: Product): ProductOrmEntity {
