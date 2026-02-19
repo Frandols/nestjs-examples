@@ -45,14 +45,6 @@ export default class Product extends Entity<string> {
     this._active = false
   }
 
-  increaseStock(quantity: number) {
-    this._stock = this._stock.increase(quantity)
-  }
-
-  decreaseStock(quantity: number) {
-    this._stock = this._stock.decrease(quantity)
-  }
-
   get name() {
     return this._name
   }

@@ -13,6 +13,7 @@ export default class Stock {
     if (quantity > this._value) {
       throw new Error('Insufficient stock')
     }
+
     return new Stock(this._value - quantity)
   }
 

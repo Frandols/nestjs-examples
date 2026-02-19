@@ -3,7 +3,6 @@ import OrderItem, {
   OrderItemFromParams,
 } from '@domain/order-item/order-item.entity'
 import OrderStatus from '@domain/order/enums/order-status.enum'
-import Product from '@domain/product/product.entity'
 
 export default class Order extends Entity<string> {
   private _status: OrderStatus = OrderStatus.CREATED
@@ -42,28 +41,26 @@ export default class Order extends Entity<string> {
     }
   }
 
-  addItem(params: { id: string; product: Product }) {
-    if (!params.product.isActive) {
-      throw new Error('Cannot add inactive product')
+  addItem(params: { id: string; productId: string; unitPrice: number }) {
+    if (this._status !== OrderStatus.CREATED) {
+      throw new Error('Cannot add items to a non-editable order')
     }
 
-    const item = OrderItem.initialize(params.id, params.product)
+    const item = OrderItem.initialize(
+      params.id,
+      params.productId,
+      params.unitPrice,
+    )
 
     this._items.push(item)
   }
 
-  confirm(products: Product[]) {
-    if (this._status !== OrderStatus.CREATED) {
-      throw new Error('Order cannot be confirmed')
-    }
+  canBeConfirmed() {
+    return this._status === OrderStatus.CREATED && this._items.length > 0
+  }
 
-    for (const item of this._items) {
-      const product = products.find((product) => product.id === item.product.id)
-
-      if (!product) throw new Error('Product not found')
-
-      product.decreaseStock(item.quantity)
-    }
+  confirm() {
+    if (!this.canBeConfirmed()) throw new Error('Order cannot be confirmed')
 
     this._status = OrderStatus.CONFIRMED
   }

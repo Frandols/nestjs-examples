@@ -1,18 +1,22 @@
 import Entity from '@domain/entity'
-import Product, { ProductFromParams } from '@domain/product/product.entity'
 
 export default class OrderItem extends Entity<string> {
   private _quantity: number = 1
 
   constructor(
     id: string,
-    private readonly _product: Product,
+    private readonly _productId: string,
+    private readonly _unitPrice: number,
   ) {
     super(id)
   }
 
-  static initialize(id: string, product: Product): OrderItem {
-    return new OrderItem(id, product)
+  static initialize(
+    id: string,
+    productId: string,
+    unitPrice: number,
+  ): OrderItem {
+    return new OrderItem(id, productId, unitPrice)
   }
 
   static from(params: OrderItemFromParams): OrderItem {
@@ -20,7 +24,11 @@ export default class OrderItem extends Entity<string> {
       throw new Error('Quantity must be greater than zero')
     }
 
-    const orderItem = new OrderItem(params.id, Product.from(params.product))
+    const orderItem = new OrderItem(
+      params.id,
+      params.productId,
+      params.unitPrice,
+    )
 
     orderItem._quantity = params.quantity
 
@@ -28,11 +36,15 @@ export default class OrderItem extends Entity<string> {
   }
 
   get subtotal(): number {
-    return this._product.price.value * this._quantity
+    return this._unitPrice * this._quantity
   }
 
-  get product() {
-    return this._product
+  get productId() {
+    return this._productId
+  }
+
+  get unitPrice() {
+    return this._unitPrice
   }
 
   get quantity() {
@@ -54,6 +66,7 @@ export default class OrderItem extends Entity<string> {
 
 export interface OrderItemFromParams {
   id: string
-  product: ProductFromParams
+  productId: string
+  unitPrice: number
   quantity: number
 }

@@ -1,38 +1,30 @@
-import OrderRepository from '@domain/order/order.repository'
-import Product from '@domain/product/product.entity'
-import ProductRepository from '@domain/product/product.repository'
+import UnitOfWork from '@application/common/unit-of-work'
 
 export default class ConfirmOrderUseCase {
-  constructor(
-    private readonly orderRepository: OrderRepository,
-    private readonly productRepository: ProductRepository,
-  ) {}
+  constructor(private readonly unitOfWork: UnitOfWork) {}
 
   async execute(orderId: string): Promise<void> {
-    const order = await this.orderRepository.findById(orderId)
+    await this.unitOfWork.execute(async (repos) => {
+      const order = await repos.orderRepository.findById(orderId)
 
-    if (!order) {
-      throw new Error('Order not found')
-    }
-
-    const products: Product[] = []
-
-    for (const item of order.items) {
-      const product = await this.productRepository.findById(item.product.id)
-
-      if (!product) {
-        throw new Error('Product not found')
+      if (!order) {
+        throw new Error('Order not found')
       }
 
-      products.push(product)
-    }
+      if (!order.canBeConfirmed()) {
+        throw new Error('Order cannot be confirmed')
+      }
 
-    order.confirm(products)
+      for (const item of order.items) {
+        await repos.productRepository.decreaseStock({
+          productId: item.productId,
+          quantity: item.quantity,
+        })
+      }
 
-    for (const product of products) {
-      await this.productRepository.save(product)
-    }
+      order.confirm()
 
-    await this.orderRepository.save(order)
+      await repos.orderRepository.save(order)
+    })
   }
 }

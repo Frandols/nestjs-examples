@@ -1,6 +1,12 @@
 import Order from '@domain/order/order.entity'
 import OrderItemOrmEntity from '@infrastructure/persistence/typeorm/order-item/order-item.orm-entity'
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryColumn,
+  VersionColumn,
+} from 'typeorm'
 
 @Entity('orders')
 export default class OrderOrmEntity {
@@ -15,6 +21,9 @@ export default class OrderOrmEntity {
     eager: true,
   })
   items: OrderItemOrmEntity[]
+
+  @VersionColumn()
+  version: number
 
   static from(domainOrder: Order): OrderOrmEntity {
     const order = new OrderOrmEntity()

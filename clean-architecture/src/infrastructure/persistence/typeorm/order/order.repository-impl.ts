@@ -1,14 +1,16 @@
 import Order from '@domain/order/order.entity'
 import OrderRepository from '@domain/order/order.repository'
 import OrderOrmEntity from '@infrastructure/persistence/typeorm/order/order.orm-entity'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { DataSource, EntityManager, Repository } from 'typeorm'
 
 export default class OrderRepositoryImpl implements OrderRepository {
-  constructor(
-    @InjectRepository(OrderOrmEntity)
-    private readonly repository: Repository<OrderOrmEntity>,
-  ) {}
+  private readonly repository: Repository<OrderOrmEntity>
+
+  constructor(dataSource: DataSource, manager?: EntityManager) {
+    this.repository = manager
+      ? manager.getRepository(OrderOrmEntity)
+      : dataSource.getRepository(OrderOrmEntity)
+  }
 
   async save(domainOrder: Order): Promise<void> {
     const ormOrder = OrderOrmEntity.from(domainOrder)
@@ -19,7 +21,7 @@ export default class OrderRepositoryImpl implements OrderRepository {
   async findById(id: string): Promise<Order | null> {
     const ormOrder = await this.repository.findOne({
       where: { id },
-      relations: ['items', 'items.product'],
+      relations: ['items'],
     })
 
     if (!ormOrder) return null

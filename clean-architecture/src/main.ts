@@ -1,6 +1,7 @@
 import AddItemToOrderUseCase from '@application/add-item-to-order.usecase'
 import CancelOrderUseCase from '@application/cancel-order.usecase'
 import IdGenerator from '@application/common/id-generator'
+import UnitOfWork from '@application/common/unit-of-work'
 import ConfirmOrderUseCase from '@application/confirm-order.usecase'
 import CreateOrderUseCase from '@application/create-order.usecase'
 import CreateProductUseCase from '@application/create-product.usecase'
@@ -20,6 +21,10 @@ import ProductOrmEntity from '@infrastructure/persistence/typeorm/product/produc
 import ProductRepositoryImpl, {
   PRODUCT_REPOSITORY,
 } from '@infrastructure/persistence/typeorm/product/product.repository-impl'
+import {
+  UNIT_OF_WORK,
+  UnitOfWorkImpl,
+} from '@infrastructure/persistence/typeorm/unit-of-work/unit-of-work.impl'
 import { Module, ValidationPipe } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
@@ -28,6 +33,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import OrderController from '@web-api/controllers/order.controller'
 import ProductController from '@web-api/controllers/product.controller'
 import Joi from 'joi'
+import { DataSource } from 'typeorm'
 
 @Module({
   providers: [
@@ -41,11 +47,13 @@ import Joi from 'joi'
 export class IdGeneratorModule {}
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProductOrmEntity])],
   providers: [
     {
       provide: PRODUCT_REPOSITORY,
-      useClass: ProductRepositoryImpl,
+      useFactory: (dataSource: DataSource) => {
+        return new ProductRepositoryImpl(dataSource)
+      },
+      inject: [DataSource],
     },
   ],
   exports: [PRODUCT_REPOSITORY],
@@ -53,16 +61,32 @@ export class IdGeneratorModule {}
 export class ProductRepositoryModule {}
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OrderOrmEntity, OrderItemOrmEntity])],
   providers: [
     {
       provide: ORDER_REPOSITORY,
-      useClass: OrderRepositoryImpl,
+      useFactory: (dataSource: DataSource) => {
+        return new OrderRepositoryImpl(dataSource)
+      },
+      inject: [DataSource],
     },
   ],
   exports: [ORDER_REPOSITORY],
 })
 export class OrderRepositoryModule {}
+
+@Module({
+  providers: [
+    {
+      provide: UNIT_OF_WORK,
+      useFactory: (dataSource: DataSource) => {
+        return new UnitOfWorkImpl(dataSource)
+      },
+      inject: [DataSource],
+    },
+  ],
+  exports: [UNIT_OF_WORK],
+})
+export class TransactionModule {}
 
 @Module({
   imports: [ProductRepositoryModule, IdGeneratorModule],
@@ -93,7 +117,12 @@ export class OrderRepositoryModule {}
 export class ProductModule {}
 
 @Module({
-  imports: [OrderRepositoryModule, ProductRepositoryModule, IdGeneratorModule],
+  imports: [
+    OrderRepositoryModule,
+    ProductRepositoryModule,
+    TransactionModule,
+    IdGeneratorModule,
+  ],
   controllers: [OrderController],
   providers: [
     {
@@ -120,11 +149,9 @@ export class ProductModule {}
     },
     {
       provide: ConfirmOrderUseCase,
-      useFactory: (
-        orderRepository: OrderRepository,
-        productRepository: ProductRepository,
-      ) => new ConfirmOrderUseCase(orderRepository, productRepository),
-      inject: [ORDER_REPOSITORY, PRODUCT_REPOSITORY],
+      useFactory: (unitOfWork: UnitOfWork) =>
+        new ConfirmOrderUseCase(unitOfWork),
+      inject: [UNIT_OF_WORK],
     },
     {
       provide: CancelOrderUseCase,
@@ -162,9 +189,10 @@ export class OrderModule {}
         username: config.get<string>('DB_USERNAME'),
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
-        autoLoadEntities: true,
         synchronize: config.get<boolean>('DB_SYNCHRONIZE'),
         logging: config.get<boolean>('DB_LOGGING'),
+
+        entities: [OrderOrmEntity, OrderItemOrmEntity, ProductOrmEntity],
       }),
     }),
     ProductModule,

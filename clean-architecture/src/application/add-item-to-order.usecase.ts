@@ -22,7 +22,11 @@ export default class AddItemToOrderUseCase {
       throw new Error('Product not found')
     }
 
-    order.addItem({ id: this.idGenerator.generate(), product })
+    order.addItem({
+      id: this.idGenerator.generate(),
+      productId: product.id,
+      unitPrice: product.price.value,
+    })
 
     await this.orderRepository.save(order)
   }

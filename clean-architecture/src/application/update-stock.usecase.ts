@@ -8,6 +8,10 @@ export default class UpdateStockUseCase {
     quantity: number
     type: 'INCREASE' | 'DECREASE'
   }): Promise<void> {
+    if (input.quantity <= 0) {
+      throw new Error('Quantity must be positive')
+    }
+
     const product = await this.productRepository.findById(input.productId)
 
     if (!product) {
@@ -15,11 +19,17 @@ export default class UpdateStockUseCase {
     }
 
     if (input.type === 'INCREASE') {
-      product.increaseStock(input.quantity)
-    } else {
-      product.decreaseStock(input.quantity)
+      await this.productRepository.increaseStock({
+        productId: input.productId,
+        quantity: input.quantity,
+      })
+
+      return
     }
 
-    await this.productRepository.save(product)
+    await this.productRepository.decreaseStock({
+      productId: input.productId,
+      quantity: input.quantity,
+    })
   }
 }
