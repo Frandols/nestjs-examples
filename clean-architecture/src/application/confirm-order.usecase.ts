@@ -4,27 +4,29 @@ export default class ConfirmOrderUseCase {
   constructor(private readonly unitOfWork: UnitOfWork) {}
 
   async execute(orderId: string): Promise<void> {
-    await this.unitOfWork.execute(async (repos) => {
-      const order = await repos.orderRepository.findById(orderId)
+    await this.unitOfWork.execute(
+      async ({ orderRepository, productRepository }) => {
+        const order = await orderRepository.findById(orderId)
 
-      if (!order) {
-        throw new Error('Order not found')
-      }
+        if (!order) {
+          throw new Error('Order not found')
+        }
 
-      if (!order.canBeConfirmed()) {
-        throw new Error('Order cannot be confirmed')
-      }
+        if (!order.canBeConfirmed()) {
+          throw new Error('Order cannot be confirmed')
+        }
 
-      for (const item of order.items) {
-        await repos.productRepository.decreaseStock({
-          productId: item.productId,
-          quantity: item.quantity,
-        })
-      }
+        for (const item of order.items) {
+          await productRepository.decreaseStock({
+            productId: item.productId,
+            quantity: item.quantity,
+          })
+        }
 
-      order.confirm()
+        order.confirm()
 
-      await repos.orderRepository.save(order)
-    })
+        await orderRepository.save(order)
+      },
+    )
   }
 }
