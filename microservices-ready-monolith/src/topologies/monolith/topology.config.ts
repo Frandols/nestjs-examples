@@ -70,6 +70,7 @@ const topologyConfig: TopologyConfig = {
             synchronize: config.get<boolean>('DB_SYNCHRONIZE'),
             logging: config.get<boolean>('DB_LOGGING'),
             autoLoadEntities: true,
+            ssl: { rejectUnauthorized: false },
           }),
         }),
         EventRouterModule,
