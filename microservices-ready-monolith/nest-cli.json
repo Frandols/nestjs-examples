@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "compilerOptions": {
+    "assets": [],
+    "watchAssets": true,
+    "deleteOutDir": true
+  },
+  "sourceRoot": "src",
+  "projects": {
+    "monolith": {
+      "type": "application",
+      "entryFile": "topologies/monolith/apps/monolith.app"
+    },
+    "split-notifications.monolith": {
+      "type": "application",
+      "entryFile": "topologies/split-notifications/apps/monolith.app"
+    },
+    "split-notifications.notifications": {
+      "type": "application",
+      "entryFile": "topologies/split-notifications/apps/notifications.app"
+    }
+  }
+}
