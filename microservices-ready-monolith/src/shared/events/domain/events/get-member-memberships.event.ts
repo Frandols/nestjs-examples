@@ -9,12 +9,8 @@ export class GetMemberMembershipsRequest {
   ) {}
 }
 
-export class GetMemberMembershipsResponse {
-  constructor(
-    public readonly memberships: {
-      planId: string;
-      startDate: Date;
-      endDate: Date;
-    }[],
-  ) {}
-}
+export type GetMemberMembershipsResponse = {
+  planId: string;
+  startDate: Date;
+  endDate: Date;
+}[];

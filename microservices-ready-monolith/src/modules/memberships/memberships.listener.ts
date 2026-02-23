@@ -27,7 +27,7 @@ export class MembershipsListener implements OnModuleInit {
         where: { memberId: event.payload.memberId },
       });
 
-      respond({ memberships });
+      respond(memberships);
     });
   }
 }
