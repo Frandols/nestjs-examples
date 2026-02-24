@@ -7,6 +7,8 @@ import { MemberEntity } from '@modules/members/member.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { MemberMembershipDto } from './dto/member-membership.dto';
+import { MemberPaymentDto } from './dto/member-payment.dto';
 
 @Injectable()
 export class MembersService {
@@ -50,7 +52,7 @@ export class MembersService {
     return memberEntityToDto(member);
   }
 
-  async findPayments(id: string) {
+  async findPayments(id: string): Promise<MemberPaymentDto[]> {
     const member = await this.findOne(id);
 
     return this.eventRouter.request('GET_MEMBER_PAYMENTS', {
@@ -58,7 +60,7 @@ export class MembersService {
     });
   }
 
-  async findMemberships(id: string) {
+  async findMemberships(id: string): Promise<MemberMembershipDto[]> {
     const member = await this.findOne(id);
 
     return this.eventRouter.request('GET_MEMBER_MEMBERSHIPS', {
