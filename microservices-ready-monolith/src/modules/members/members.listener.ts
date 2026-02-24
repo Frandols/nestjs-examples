@@ -1,8 +1,9 @@
-import { EventService } from '@events/application/event-service';
+import { EventRouter } from '@events/application/event-router';
+import { EventPayload } from '@events/domain/event-contracts';
+import { MemberEntity } from '@modules/members/member.entity';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MemberEntity } from './member.entity';
 
 @Injectable()
 export class MembersListener implements OnModuleInit {
@@ -10,16 +11,21 @@ export class MembersListener implements OnModuleInit {
     @InjectRepository(MemberEntity)
     private readonly repo: Repository<MemberEntity>,
 
-    private readonly eventService: EventService,
+    private readonly eventRouter: EventRouter,
   ) {}
 
   onModuleInit() {
-    this.eventService.onMemberExistsById(async (request, respond) => {
-      const exists = await this.repo.exists({
-        where: { id: request.payload.memberId },
-      });
+    this.eventRouter.onRequest(
+      'GET_MEMBER_EXISTS_BY_ID',
+      this.handleGetMemberExistsById.bind(this),
+    );
+  }
 
-      respond(exists);
+  private async handleGetMemberExistsById(
+    payload: EventPayload<'GET_MEMBER_EXISTS_BY_ID'>,
+  ) {
+    return await this.repo.exists({
+      where: { id: payload.memberId },
     });
   }
 }

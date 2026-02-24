@@ -1,6 +1,5 @@
-import { DynamicModule, Global, Module } from '@nestjs/common';
-import { EventService } from './application/event-service';
-import { EVENT_ROUTER, EventRouter } from './domain/event-router';
+import { EventRouter } from '@events/application/event-router';
+import { DynamicModule, Module } from '@nestjs/common';
 
 export interface EventsOptions {
   eventRouter: EventRouter;
@@ -13,12 +12,11 @@ export class EventsModule {
       module: EventsModule,
       providers: [
         {
-          provide: EVENT_ROUTER,
+          provide: EventRouter,
           useValue: options.eventRouter,
         },
-        EventService,
       ],
-      exports: [EventService],
+      exports: [EventRouter],
     };
   }
 }

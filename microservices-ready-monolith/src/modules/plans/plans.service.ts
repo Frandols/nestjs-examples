@@ -1,46 +1,48 @@
+import { CreatePlanDto } from '@modules/plans/dto/create-plan.dto';
+import { PlanDto } from '@modules/plans/dto/plan-dto';
+import { UpdatePlanDto } from '@modules/plans/dto/update-plan.dto';
+import { planEntityToDto } from '@modules/plans/mappers/plan-entity-to-dto.mapper';
+import { PlanEntity } from '@modules/plans/plan.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { PlanEntity } from './plan.entity';
 
 @Injectable()
 export class PlansService {
   constructor(
     @InjectRepository(PlanEntity)
-    private readonly planRepository: Repository<PlanEntity>,
+    private readonly repo: Repository<PlanEntity>,
   ) {}
 
-  async create(planData: Partial<PlanEntity>): Promise<PlanEntity> {
-    const plan = this.planRepository.create(planData);
+  async create(dto: CreatePlanDto): Promise<Pick<PlanDto, 'id'>> {
+    const plan = this.repo.create(dto);
 
-    await this.planRepository.save(plan);
+    await this.repo.save(plan);
 
-    return plan;
+    return { id: plan.id };
   }
 
-  async findAll(): Promise<PlanEntity[]> {
-    return this.planRepository.find();
+  async findAll(): Promise<PlanDto[]> {
+    const plans = await this.repo.find();
+
+    return plans.map(planEntityToDto);
   }
 
-  async findOne(id: string): Promise<PlanEntity> {
-    const plan = await this.planRepository.findOne({ where: { id } });
+  async findOne(id: string): Promise<PlanDto> {
+    const plan = await this.repo.findOne({ where: { id } });
 
     if (!plan) throw new NotFoundException(`Plan ${id} not found`);
 
-    return plan;
+    return planEntityToDto(plan);
   }
 
-  async update(id: string, data: Partial<PlanEntity>): Promise<PlanEntity> {
-    const plan = await this.findOne(id);
+  async update(id: string, dto: UpdatePlanDto): Promise<Pick<PlanDto, 'id'>> {
+    await this.repo.update(id, dto);
 
-    Object.assign(plan, data);
-
-    await this.planRepository.save(plan);
-
-    return plan;
+    return { id };
   }
 
   async remove(id: string): Promise<void> {
-    await this.planRepository.update(id, { active: false });
+    await this.repo.update(id, { active: false });
   }
 }

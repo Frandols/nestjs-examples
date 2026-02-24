@@ -1,9 +1,9 @@
-import { EventService } from '@events/application/event-service';
+import { EventRouter } from '@events/application/event-router';
+import { CreatePaymentDto } from '@modules/payments/dto/create-payment.dto';
+import { PaymentEntity } from '@modules/payments/payment.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import { PaymentEntity } from './payment.entity';
 
 @Injectable()
 export class PaymentsService {
@@ -11,11 +11,11 @@ export class PaymentsService {
     @InjectRepository(PaymentEntity)
     private readonly repo: Repository<PaymentEntity>,
 
-    private readonly eventService: EventService,
+    private readonly eventRouter: EventRouter,
   ) {}
 
-  async create(dto: CreatePaymentDto): Promise<PaymentEntity> {
-    const membership = await this.eventService.getMembershipById({
+  async create(dto: CreatePaymentDto): Promise<{ id: string }> {
+    const membership = await this.eventRouter.request('GET_MEMBERSHIP_BY_ID', {
       membershipId: dto.membershipId,
     });
 
@@ -30,12 +30,12 @@ export class PaymentsService {
 
     await this.repo.save(payment);
 
-    this.eventService.notifyPaymentCompleted({
+    this.eventRouter.emit('PAYMENT_COMPLETED', {
       memberId: membership.memberId,
       membershipId: payment.membershipId,
       amount: payment.amount,
     });
 
-    return payment;
+    return { id: payment.id };
   }
 }

@@ -1,9 +1,9 @@
+import { PlanEntity } from '@modules/plans/plan.entity';
+import { PlansController } from '@modules/plans/plans.controller';
+import { PlansListener } from '@modules/plans/plans.listener';
+import { PlansService } from '@modules/plans/plans.service';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PlanEntity } from './plan.entity';
-import { PlansController } from './plans.controller';
-import { PlansListener } from './plans.listener';
-import { PlansService } from './plans.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PlanEntity])],

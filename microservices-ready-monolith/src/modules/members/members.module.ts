@@ -1,9 +1,9 @@
+import { MemberEntity } from '@modules/members/member.entity';
+import { MembersController } from '@modules/members/members.controller';
+import { MembersListener } from '@modules/members/members.listener';
+import { MembersService } from '@modules/members/members.service';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MemberEntity } from './member.entity';
-import { MembersController } from './members.controller';
-import { MembersListener } from './members.listener';
-import { MembersService } from './members.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([MemberEntity])],

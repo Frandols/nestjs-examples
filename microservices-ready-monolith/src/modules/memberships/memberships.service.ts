@@ -1,8 +1,8 @@
-import { EventService } from '@events/application/event-service';
+import { EventRouter } from '@events/application/event-router';
+import { MembershipEntity } from '@modules/memberships/membership.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MembershipEntity } from './membership.entity';
 
 @Injectable()
 export class MembershipsService {
@@ -10,7 +10,7 @@ export class MembershipsService {
     @InjectRepository(MembershipEntity)
     private readonly repo: Repository<MembershipEntity>,
 
-    private readonly eventService: EventService,
+    private readonly eventRouter: EventRouter,
   ) {}
 
   async create({
@@ -21,13 +21,16 @@ export class MembershipsService {
     memberId: string;
     planId: string;
     startDate?: string;
-  }): Promise<MembershipEntity> {
-    const memberExists = await this.eventService.memberExistsById({ memberId });
+  }): Promise<{ id: string }> {
+    const memberExists = await this.eventRouter.request(
+      'GET_MEMBER_EXISTS_BY_ID',
+      { memberId },
+    );
 
     if (!memberExists)
       throw new NotFoundException(`Member ${memberId} not found`);
 
-    const plan = await this.eventService.getPlanById({ planId });
+    const plan = await this.eventRouter.request('GET_PLAN_BY_ID', { planId });
 
     if (!plan) throw new NotFoundException(`Plan ${planId} not found`);
 
@@ -39,20 +42,22 @@ export class MembershipsService {
       memberId,
       planId,
       startDate,
-      endDate: new Date(
-        startDate.getTime() + plan.durationDays * 24 * 60 * 60 * 1000,
-      ),
+      endDate: this.calculateEndDate(startDate, plan.durationDays),
       active: true,
     });
 
     await this.repo.save(membership);
 
-    this.eventService.notifyMembershipCreated({
+    this.eventRouter.emit('MEMBERSHIP_CREATED', {
       planName: plan.name,
       durationDays: plan.durationDays,
       memberId,
     });
 
-    return membership;
+    return { id: membership.id };
+  }
+
+  private calculateEndDate(startDate: Date, durationDays: number): Date {
+    return new Date(startDate.getTime() + durationDays * 24 * 60 * 60 * 1000);
   }
 }

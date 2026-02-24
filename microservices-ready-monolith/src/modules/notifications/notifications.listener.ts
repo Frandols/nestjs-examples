@@ -1,5 +1,5 @@
-import { EventService } from '@events/application/event-service';
-import { MembershipCreatedEvent } from '@events/domain/events/membership-created.event';
+import { EventRouter } from '@events/application/event-router';
+import { EventPayload } from '@events/domain/event-contracts';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,15 +11,17 @@ export class NotificationsListener implements OnModuleInit {
     @InjectRepository(NotificationEntity)
     private readonly repo: Repository<NotificationEntity>,
 
-    private readonly eventService: EventService,
+    private readonly eventRouter: EventRouter,
   ) {}
 
   onModuleInit() {
-    this.eventService.onMembershipCreated(
+    this.eventRouter.on(
+      'MEMBERSHIP_CREATED',
       this.handleMembershipCreated.bind(this),
     );
 
-    this.eventService.onPaymentCompleted(
+    this.eventRouter.on(
+      'PAYMENT_COMPLETED',
       this.handlePaymentCompleted.bind(this),
     );
   }
@@ -34,22 +36,23 @@ export class NotificationsListener implements OnModuleInit {
     return this.repo.save(notification);
   }
 
-  private async handleMembershipCreated(event: MembershipCreatedEvent) {
+  private async handleMembershipCreated(
+    payload: EventPayload<'MEMBERSHIP_CREATED'>,
+  ) {
     await this.create({
-      memberId: event.memberId,
+      memberId: payload.memberId,
       type: NotificationType.MEMBERSHIP_ASSIGNED,
-      message: `Tu plan ${event.planName} ha sido asignado y dura ${event.durationDays} días.`,
+      message: `Tu plan ${payload.planName} ha sido asignado y dura ${payload.durationDays} días.`,
     });
   }
 
-  private async handlePaymentCompleted(event: {
-    memberId: string;
-    amount: number;
-  }) {
+  private async handlePaymentCompleted(
+    payload: EventPayload<'PAYMENT_COMPLETED'>,
+  ) {
     await this.create({
-      memberId: event.memberId,
+      memberId: payload.memberId,
       type: NotificationType.PAYMENT_COMPLETED,
-      message: `Pago de $${event.amount} completado para tu membresía.`,
+      message: `Pago de $${payload.amount} completado para tu membresía.`,
     });
   }
 }

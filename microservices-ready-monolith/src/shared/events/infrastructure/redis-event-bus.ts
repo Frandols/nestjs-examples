@@ -1,7 +1,7 @@
+import { config } from '@app/config';
 import { EventBus } from '@events/domain/event-bus';
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import 'dotenv/config';
-import Redis, { RedisOptions } from 'ioredis';
+import { Injectable } from '@nestjs/common';
+import Redis from 'ioredis';
 
 interface RedisMessage<T = any> {
   payload: T;
@@ -10,17 +10,17 @@ interface RedisMessage<T = any> {
 }
 
 @Injectable()
-export class RedisEventBus extends EventBus {
+export class RedisEventBus implements EventBus {
   private publisher: Redis;
   private subscriber: Redis;
 
   private handlers: Record<string, Array<(payload: any) => void>> = {};
 
   constructor() {
-    super();
+    const redisUrl = config.REDIS_URL;
 
-    this.publisher = new Redis(process.env.REDIS_URL);
-    this.subscriber = new Redis(process.env.REDIS_URL);
+    this.publisher = new Redis(redisUrl);
+    this.subscriber = new Redis(redisUrl);
 
     this.subscriber.on('message', async (channel, message) => {
       const parsed: RedisMessage = JSON.parse(message);
@@ -30,7 +30,7 @@ export class RedisEventBus extends EventBus {
       if (!listeners) return;
 
       for (const listener of listeners) {
-        await listener(parsed.payload);
+        listener(parsed.payload);
       }
     });
   }
@@ -43,12 +43,25 @@ export class RedisEventBus extends EventBus {
     this.publisher.publish(eventName, JSON.stringify(message));
   }
 
-  on<T = any>(eventName: string, listener: (event: T) => void): void {
+  on<T = any>(eventName: string, listener: (event: T) => void): () => void {
     if (!this.handlers[eventName]) {
       this.handlers[eventName] = [];
+
       this.subscriber.subscribe(eventName);
     }
 
     this.handlers[eventName].push(listener);
+
+    return () => {
+      this.handlers[eventName] = this.handlers[eventName].filter(
+        (h) => h !== listener,
+      );
+
+      if (this.handlers[eventName].length === 0) {
+        delete this.handlers[eventName];
+
+        this.subscriber.unsubscribe(eventName);
+      }
+    };
   }
 }
