@@ -2,8 +2,9 @@ import CreateProductUseCase from '@application/create-product.usecase'
 import DeactivateProductUseCase from '@application/deactivate-product.usecase'
 import UpdateStockUseCase from '@application/update-stock.usecase'
 import { Body, Controller, Param, Patch, Post } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import CreateProductDto from '@web-api/dto/create-product.dto'
+import { IdResponseDto } from '@web-api/dto/id-response.dto'
 import UpdateStockDto from '@web-api/dto/update-stock.dto'
 
 @ApiTags('products')
@@ -16,29 +17,39 @@ export default class ProductController {
   ) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a new product' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product created successfully',
+    type: IdResponseDto,
+  })
   async create(@Body() createProductDto: CreateProductDto) {
-    await this.createProductUseCase.execute(createProductDto)
-
-    return { message: 'Product created' }
+    return await this.createProductUseCase.execute(createProductDto)
   }
 
   @Patch(':id/stock')
+  @ApiOperation({ summary: 'Update stock of a product' })
+  @ApiResponse({
+    status: 200,
+    description: 'Stock updated successfully',
+  })
   async updateStock(
     @Param('id') id: string,
     @Body() updateStockDto: UpdateStockDto,
   ) {
-    await this.updateStockUseCase.execute({
+    return await this.updateStockUseCase.execute({
       productId: id,
       ...updateStockDto,
     })
-
-    return { message: 'Stock updated' }
   }
 
   @Patch(':id/deactivate')
+  @ApiOperation({ summary: 'Deactivate a product' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product deactivated successfully',
+  })
   async deactivate(@Param('id') id: string) {
-    await this.deactivateProductUseCase.execute(id)
-
-    return { message: 'Product deactivated' }
+    return await this.deactivateProductUseCase.execute(id)
   }
 }

@@ -1,4 +1,5 @@
 import IdGenerator from '@application/common/id-generator'
+import IdDto from '@application/dto/id.dto'
 import OrderRepository from '@domain/order/order.repository'
 import ProductRepository from '@domain/product/product.repository'
 
@@ -9,7 +10,7 @@ export default class AddItemToOrderUseCase {
     private readonly idGenerator: IdGenerator,
   ) {}
 
-  async execute(input: { orderId: string; productId: string }): Promise<void> {
+  async execute(input: { orderId: string; productId: string }): Promise<IdDto> {
     const order = await this.orderRepository.findById(input.orderId)
 
     if (!order) {
@@ -22,12 +23,16 @@ export default class AddItemToOrderUseCase {
       throw new Error('Product not found')
     }
 
-    order.addItem({
+    const item = {
       id: this.idGenerator.generate(),
       productId: product.id,
       unitPrice: product.price.value,
-    })
+    }
+
+    order.addItem(item)
 
     await this.orderRepository.save(order)
+
+    return { id: item.id }
   }
 }
