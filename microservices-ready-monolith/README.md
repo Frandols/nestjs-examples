@@ -313,6 +313,8 @@ Valida que la membresía exista (vía evento). Emite `PAYMENT_COMPLETED` al comp
 
 # 🧩 Topologías
 
+![Diagrama de topologías: monolito (proceso único con InMemory Event Bus) vs split (múltiples procesos con Redis Event Bus)](modular-monolith.drawio.png)
+
 ## Monolith (por defecto)
 
 Todos los módulos corren en un único proceso. El `EventBus` es `InMemoryEventBus`.
