@@ -6,6 +6,7 @@ import {
   EventName,
   RequestContractMap,
   RequestName,
+  RequestPayload,
 } from '@events/domain/event-contracts';
 import { Injectable } from '@nestjs/common';
 
@@ -63,15 +64,16 @@ export class EventRouter {
   async onRequest<Name extends RequestName>(
     eventName: Name,
     listener: (
-      event: RequestContractMap[Name]['payload'],
+      event: RequestPayload<Name>,
     ) => Promise<RequestContractMap[Name]['response']>,
   ) {
-    this.resolveBus(eventName).on<
-      RequestContractMap[Name]['payload'] & { respondTo: string }
-    >(eventName, async (payload) => {
-      const response = await listener(payload);
+    this.resolveBus(eventName).on<RequestPayload<Name>>(
+      eventName,
+      async (payload) => {
+        const response = await listener(payload);
 
-      this.resolveBus(eventName).emit(payload.respondTo, response);
-    });
+        this.resolveBus(eventName).emit(payload.respondTo, response);
+      },
+    );
   }
 }

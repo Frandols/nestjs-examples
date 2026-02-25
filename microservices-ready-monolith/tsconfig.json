@@ -22,7 +22,12 @@
       "@modules/*": ["src/modules/*"],
       "@shared/*": ["src/shared/*"],
       "@topologies/*": ["src/topologies/*"],
-      "@app/*": ["src/*"]
+      "@app/*": ["src/*"],
+      "@billing/*": ["src/modules/billing/*"],
+      "@memberships/*": ["src/modules/billing/memberships/*"],
+      "@members/*": ["src/modules/billing/members/*"],
+      "@payments/*": ["src/modules/billing/payments/*"],
+      "@plans/*": ["src/modules/billing/plans/*"]
     }
   }
 }

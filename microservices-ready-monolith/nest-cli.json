@@ -6,20 +6,5 @@
     "watchAssets": true,
     "deleteOutDir": true
   },
-  "sourceRoot": "src",
-  "entryFile": "topologies/monolith/apps/monolith.app",
-  "projects": {
-    "monolith": {
-      "type": "application",
-      "entryFile": "topologies/monolith/apps/monolith.app"
-    },
-    "split-notifications.monolith": {
-      "type": "application",
-      "entryFile": "topologies/split-notifications/apps/monolith.app"
-    },
-    "split-notifications.notifications": {
-      "type": "application",
-      "entryFile": "topologies/split-notifications/apps/notifications.app"
-    }
-  }
+  "sourceRoot": "src"
 }

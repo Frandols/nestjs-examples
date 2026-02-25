@@ -1,49 +1,12 @@
-export type RequestContractMap = {
-  GET_MEMBER_EXISTS_BY_ID: {
-    payload: {
-      memberId: string;
-    };
-    response: boolean;
-  };
-  GET_MEMBER_MEMBERSHIPS: {
-    payload: {
-      memberId: string;
-    };
-    response: {
-      planId: string;
-      startDate: Date;
-      endDate: Date;
-    }[];
-  };
-  GET_MEMBER_PAYMENTS: {
-    payload: {
-      memberId: string;
-    };
-    response: {
-      membershipId: string;
-      amount: number;
-    }[];
-  };
-  GET_MEMBERSHIP_BY_ID: {
-    payload: {
-      membershipId: string;
-    };
-    response: {
-      memberId: string;
-    };
-  };
-  GET_PLAN_BY_ID: {
-    payload: {
-      planId: string;
-    };
-    response: {
-      name: string;
-      durationDays: number;
-    };
-  };
-};
+export type RequestContractMap = {};
 
 export type RequestName = keyof RequestContractMap;
+
+export type RequestPayload<Name extends RequestName> = {
+  respondTo: string;
+} & (RequestContractMap[Name]['payload'] extends {}
+  ? RequestContractMap[Name]['payload']
+  : {});
 
 export type EmitContractMap = {
   MEMBERSHIP_CREATED: {
