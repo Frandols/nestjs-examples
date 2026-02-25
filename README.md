@@ -44,6 +44,23 @@ API REST desarrollada con NestJS aplicando principios de:
 👉 Ver documentación completa dentro de:  
 `/clean-architecture/README.md`
 
+## 🧩 modular-monolith
+
+API REST desarrollada con NestJS aplicando principios de:
+
+- Monolito Modular Event-Driven con Kernel de Eventos
+- Módulos autónomos y aislados
+- Event bus intercambiable (InMemory / Redis)
+- Comunicación entre módulos vía eventos tipados (fire-and-forget)
+- Contratos de eventos centralizados
+- Topologías de despliegue configurables (Single-Process / Multi-Process)
+- PostgreSQL + TypeORM
+- Validación de configuración con Zod
+- Swagger
+
+👉 Ver documentación completa dentro de:  
+`/modular-monolith/README.md`
+
 ---
 
 # 🏗️ Filosofía del Repositorio
